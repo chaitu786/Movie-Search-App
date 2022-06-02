@@ -1,0 +1,412 @@
+<!--  -->
+<!-- myapi:-  -->
+<!-- base:https://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&api_key=e57244401adfc359ef9a9fd132bee2f5 -->
+<!-- https://image.tmdb.org/t/p/w500/ -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>popularfilm</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        .search {
+            width: 100%;
+            border: 1px solid #0d082f;
+            background-color: #0d082f;
+            display: flex;
+        }
+        
+        #films {
+            width: 100%;
+            display: grid;
+            grid-template-columns: 15% 15% 15% 15% 15%;
+            grid-gap: 5%;
+            margin-top: 50px;
+            background-color: #020108;
+        }
+        
+        .inut {
+            width: 40%;
+            margin: auto;
+            margin-top: 20px;
+        }
+        
+        .thismovie {
+            width: 100%;
+        }
+        
+        body {
+            width: 100%;
+            background-color: #020108;
+        }
+        
+        .inut {
+            background-color: white;
+            height: 30px;
+        }
+        
+        input {
+            outline: none;
+            border-bottom: #faf9f0;
+            height: 30px;
+        }
+        
+        .movieholder {
+            width: 100%;
+            margin-top: 20px;
+            margin-left: 20px;
+            margin-right: 20px;
+            margin-bottom: 20px;
+        }
+        
+        img {
+            max-width: 100%;
+        }
+        
+        p {
+            color: white
+        }
+        
+        #dropdown {
+            height: 300px;
+            position: absolute;
+            z-index: 1;
+            width: 40.5%;
+            border: 1px solid white;
+            overflow: scroll;
+            border-top: none;
+            display: none;
+            background-color: #09032c;
+        }
+        
+        .dropdownp {
+            color: white;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+        
+        .bigdiv {
+            margin-left: 20px;
+            width: 50%;
+            height: 100px;
+            margin-top: 10px;
+            border: 1px solid black;
+            display: flex;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            background-color: #020108;
+        }
+        
+        .dropdiv {
+            width: 30%;
+        }
+        
+        .rightdiv {
+            width: 50%;
+            margin-left: 0px;
+        }
+        
+        .dropimage {
+            max-width: 100%;
+            max-height: 100%;
+        }
+        
+        .showmyfilm {
+            display: none;
+            width: 80%;
+            margin-bottom: 20px;
+            margin-top: 20px;
+            margin: auto;
+        }
+        
+        .middle {
+            display: flex;
+            width: 100%;
+            margin: auto;
+            margin-top: 30px;
+        }
+        
+        .left {
+            width: 30%;
+            margin-left: 40px;
+            margin-top: 50px;
+        }
+        
+        .right {
+            width: 40%;
+            box-sizing: border-box;
+            height: fit-content;
+            margin-top: 50px;
+        }
+        
+        #imageforsearh {
+            max-width: 50%;
+        }
+        
+        .type {
+            color: honeydew;
+            margin-top: 10px;
+            margin-bottom: 0px;
+            font-size: 20px;
+        }
+        
+        .makelogin {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: red;
+            align-content: center;
+            margin-top: 20px;
+            margin-right: 80px;
+            object-fit: cover;
+        }
+        
+        .makelogin img {
+            max-width: 100%;
+            object-fit: cover;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="search" id="getsearh">
+            <div class="inut">
+                <input type="text" id="takemovie" placeholder="Enter the movie name" class="thismovie" oninput="debounce(main,1000)">
+
+                <div id="dropdown">
+
+                </div>
+            </div>
+            <div class="makelogin" onclick="signup()">
+                <img src="https://cdn-icons.flaticon.com/png/512/5654/premium/5654864.png?token=exp=1634413158~hmac=2543f2de2e4f0c213be1dd2d65f677e6" alt="">
+            </div>
+
+
+        </div>
+        <div class="showmyfilm" id="filmdeklona">
+            <div class="middle" id="middleflex">
+                <div class="left" id="leftforimg">
+                    <img src="" alt="" id="imageforsearh">
+                </div>
+                <div class="right" id="righforming">
+
+                </div>
+            </div>
+
+
+        </div>
+        <div id="films">
+
+        </div>
+    </div>
+
+
+</body>
+<script>
+    var timerid;
+
+    let movies_div = document.getElementById("films");
+    let selectfilminfo = document.getElementById("filmdeklona");
+
+    let drop = document.getElementById("dropdown");
+    async function searchMovies(movie_name) {
+        try {
+            let res = await fetch(`http://www.omdbapi.com/?apikey=d51aa006&s=${movie_name}`);
+            let data = await res.json();
+            return data;
+        } catch (e) {
+            console.log("e", e);
+
+        }
+    }
+
+    function appendMovies(movies) {
+        if (movies === undefined) {
+            return false;
+        }
+        drop.innerHTML = null;
+        movies.forEach(function(movie) {
+            let bigdiv = document.createElement("div");
+            bigdiv.setAttribute("class", "bigdiv");
+            bigdiv.addEventListener("click", function() {
+                selectmovie(movie);
+            });
+            let div = document.createElement("div");
+            div.setAttribute("class", "dropdiv");
+            let image = document.createElement("img");
+            image.src = movie.Poster;
+            image.setAttribute("class", "dropimage")
+            div.append(image);
+            let div2 = document.createElement("div");
+            div2.setAttribute("class", "rightdiv");
+
+            let p = document.createElement("p");
+            p.setAttribute("class", "dropdownp")
+            p.innerHTML = movie.Title;
+            div2.append(p);
+            bigdiv.append(div, div2)
+            drop.append(bigdiv);
+        });
+
+    }
+    async function main() {
+        let name = document.getElementById("takemovie").value;
+
+        if (name.length === 0) {
+            drop.style.display = "none";
+        }
+        if (name.length < 3) {
+            return false;
+        }
+
+        let res = await searchMovies(name);
+        let moviesdata = res.Search;
+        appendMovies(moviesdata)
+        console.log("res", moviesdata);
+
+    }
+
+    function debounce(func, delay) {
+        // lets talk about 4
+        //func =main()
+
+        drop.style.display = "block";
+
+
+        if (timerid) {
+            clearTimeout(timerid);
+        }
+        timerid = setTimeout(function() {
+            func();
+
+        }, delay)
+    }
+
+
+
+    function selectmovie(e) {
+        let name = document.getElementById("takemovie");
+        let left = document.getElementById("middleflex")
+        let right = document.getElementById("righforming")
+        let image = document.getElementById("imageforsearh")
+        name.value = ""
+        drop.style.display = "none";
+        right.innerHTML = "";
+
+        selectfilminfo.style.display = "block";
+        image.src = e.Poster;
+        let filmname = document.createElement("p");
+        filmname.innerHTML = e.Title;
+        filmname.innerHTML = e.Title;
+        filmname.setAttribute("class", "type")
+        let relesedate = document.createElement("p");
+        relesedate.setAttribute("class", "type")
+        relesedate.innerHTML = "Released-Year: " + e.Year
+        let imdb = document.createElement("p");
+
+        imdb.innerHTML = "ImdbRating: " + e.imdbRating
+        imdb.setAttribute("class", "type")
+        let movietype = document.createElement("p");
+
+        movietype.innerHTML = "Type: " + e.Type
+        movietype.setAttribute("class", "type")
+        right.append(filmname, relesedate, imdb, movietype);
+
+
+    }
+
+
+
+    async function getmovie() {
+        try {
+            let res = await fetch(`https://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&api_key=e57244401adfc359ef9a9fd132bee2f5`);
+            var data = await res.json();
+            let movies = data.results;
+            console.log(movies)
+            displaymovie(movies)
+
+        } catch (e) {
+            console.log("e", e);
+
+        }
+    }
+
+    function displaymovie(movies) {
+        movies.forEach(function(movie) {
+
+
+
+            let div = document.createElement("div");
+            div.addEventListener("click", function() {
+                selectmoviep(movie);
+            });
+            div.setAttribute("class", "movieholder")
+            let img = document.createElement("img");
+            img.src = "https://image.tmdb.org/t/p/w500" + movie.poster_path;
+
+            let name = document.createElement("p");
+            name.innerHTML = movie.title
+            let relesedate = document.createElement("p");
+            relesedate.innerHTML = movie.release_date
+            let imdb = document.createElement("p");
+            imdb.innerHTML = movie.vote_average
+
+
+            console.log(movie.title)
+
+
+            div.append(img, name, relesedate, imdb, );
+            movies_div.append(div);
+
+        })
+
+
+
+    }
+
+    function selectmoviep(e) {
+        let name = document.getElementById("takemovie");
+        let left = document.getElementById("middleflex")
+        let right = document.getElementById("righforming")
+        let image = document.getElementById("imageforsearh")
+        name.value = ""
+        drop.style.display = "none";
+        right.innerHTML = "";
+
+        selectfilminfo.style.display = "block";
+        image.src = "https://image.tmdb.org/t/p/w500" + e.poster_path;
+        let filmname = document.createElement("p");
+        filmname.innerHTML = e.title;
+
+        filmname.setAttribute("class", "type")
+        let relesedate = document.createElement("p");
+        relesedate.setAttribute("class", "type")
+        relesedate.innerHTML = "Released-Year: " + e.release_date
+        let imdb = document.createElement("p");
+
+        imdb.innerHTML = "ImdbRating: " + e.vote_average
+        imdb.setAttribute("class", "type")
+        let movietype = document.createElement("p");
+
+        movietype.innerHTML = "Overveiw: " + e.overview
+        movietype.setAttribute("class", "type")
+        right.append(filmname, relesedate, imdb, movietype);
+
+    }
+    getmovie();
+
+    function signup() {
+        window.location.href = "signup.html";
+    }
+</script>
+
+</html>

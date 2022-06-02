@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    #signup-form,
+    #login-form {
+        width: 20px;
+    }
+    
+    input {
+        margin-top: 5px;
+        margin-top: 20px;
+        width: 300px;
+    }
+    
+    .fle {
+        display: flex;
+        margin-left: 20px;
+    }
+    
+    .right {
+        margin-left: 800px;
+        width: 500px;
+        margin-top: 30px;
+    }
+    
+    p {
+        font-size: 20px;
+        margin-top: 30px;
+        margin-bottom: 5px;
+        font-weight: 400;
+    }
+    
+    .got {
+        margin-top: 10px;
+    }
+    
+    .left {
+        margin-left: 50px;
+    }
+</style>
+
+<body>
+    <div class="fle">
+
+        <div id="forms" class="left">
+            <div id="login">
+                <form id="login-form" onsubmit="login(event)">
+                    <h1>login</h1>
+                    <input type="text" id="user" placeholder="username" />
+                    <input type="password" id="pass" placeholder="password" />
+
+
+                    <input type="submit" />
+                </form>
+            </div>
+        </div>
+        <div class="right" id="detai">
+            <h1 class="got">User Detail</h1>
+            <div id="getdetail">
+
+            </div>
+        </div>
+    </div>
+
+</body>
+<script>
+    function login(e) {
+        e.preventDefault();
+        let form = document.getElementById("login-form");
+        let take = document.getElementById("forms");
+        console.log("gaurav")
+        let user_data = {
+            username: form.user.value,
+            password: form.pass.value,
+
+
+        };
+
+        let data_to_send = JSON.stringify(user_data);
+        console.log(data_to_send);
+        fetch("https://masai-api-mocker.herokuapp.com/auth/login", {
+            method: "POST",
+            body: data_to_send,
+            headers: {
+                "Content-Type": "application/json",
+            },
+        }).then((res) => {
+            return res.json();
+        }).then((res) => {
+            console.log("res:", res);
+            fetchData(user_data.username, res.token)
+
+        }).catch((err) => {
+            console.log(err);
+        })
+    }
+    let right = document.getElementById("getdetail");
+
+    function fetchData(username, token) {
+        fetch(`https://masai-api-mocker.herokuapp.com/user/${username}`, {
+                headers: {
+                    //get method is by default
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+
+                },
+            }).then((res) => {
+                return res.json()
+            })
+            .then((res) => {
+                console.log("res:", res);
+                // detail(res);
+                display(res);
+            })
+            .catch((err) => {
+
+                console.log(err)
+            });
+    }
+
+    // displaying the data to the right div
+    function display(data) {
+
+        let bigg = document.createElement("div");
+        let user = document.createElement("p");
+        user.innerHTML = `Username: ${data.username}`;
+        console.log(user);
+        let mobile = document.createElement("p")
+        mobile.innerHTML = `mobile: ${data.mobile}`;
+        let email = document.createElement("p")
+        email.innerHTML = `email: ${data.email}`;
+        let description = document.createElement("p")
+        description.innerHTML = `description: ${data.description}`;
+
+        bigg.append(user, mobile, email, description);
+        right.append(bigg);
+
+
+    }
+
+    // function detail(e) {
+
+
+    //     let leftdiv = document.createElement("div");
+    //     let name = document.createElement('p');
+    //     name.innerHTML = e.username;
+    //     let token = document.createElement("p");
+    //     token.innerHTML = e.token;
+    //     let email = document.createElement("p");
+    //     token.innerHTML = e.email;
+
+    //     let des = document.createElement("p");
+    //     des.innerHTML = e.description;
+    //     let mobile = document.createElement("p");
+    //     mobile.innerHTML = e.mobile;
+    //     leftdiv.append(name, token, email, des, mobile);
+    //     take.append(leftdiv);
+
+
+
+    // }
+
+    // function notsucess(err) {
+    //     div = document.createElement("div");
+    //     div.innerHTML = `${err}`
+    //     take.append(leftdiv);
+    // }
+</script>
+
+</html>
